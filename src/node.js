@@ -13,13 +13,16 @@ function Tree(array) {
   // sort the provided array
   array = array.sort(compareNumbers);
 
+  //remove duplicate values
+  array = [...new Set(array)]
+
   console.log(array)
   
   // use recursion to build the balance binary search tree
   // requires a sorted array
-  const buildTree = (array, start = 0, end = array.length) => {
+  const buildTree = (array, start = 0, end = array.length - 1) => {
     if (start > end) return null;
-    const mid = (start + end) / 2;
+    const mid = Math.ceil((start + end) / 2);
 
     //escape if it's trying to access an out of range value.
     if (mid === array.length) return null
@@ -28,10 +31,10 @@ function Tree(array) {
     root.left = buildTree(array, start, mid - 1);
     root.right = buildTree(array, mid + 1, end);
 
-    console.log(root)
-    console.log(start)
-    console.log(end)
-    console.log(mid)
+    // console.log(root)
+    // console.log(start)
+    // console.log(end)
+    // console.log(mid)
 
     return root;
   };
@@ -106,9 +109,9 @@ const prettyPrint = (node, prefix = "", isLeft = true) => {
 };
 
 
-const myTree = Tree([1,2])
+// const myTree = Tree([1,2,1,1,1])
 
-// const myTree = Tree([1, 7, 4, 23, 8, 9, 4, 3, 5, 7, 9, 67, 6345, 324]);
+const myTree = Tree([1, 7, 4, 23, 8, 9, 4, 3, 5, 7, 9, 67, 6345, 324]);
 console.log('Created Tree. Printing tree:')
 prettyPrint(myTree.root);
 
