@@ -38,6 +38,15 @@ function Tree(array) {
 
     return root;
   };
+
+  const traverse = (root) => {
+    if (root.left == null && root.right == null) return console.log(root)
+
+    if (root.left != null) traverse(root.left)
+    if (root.right != null) traverse(root.right)
+
+    return console.log(root)
+  }
   
   const insert = (root, value) => {
     // if insert is run on a null node
@@ -92,7 +101,7 @@ function Tree(array) {
   // use return value of the BBST function for root
   let root = buildTree(array);
 
-  return { root, insert, deleteItem, insert, getSuccessor };
+  return { root, insert, deleteItem, insert, getSuccessor, traverse };
 }
 
 const prettyPrint = (node, prefix = "", isLeft = true) => {
@@ -115,6 +124,8 @@ const myTree = Tree([1, 7, 4, 23, 8, 9, 4, 3, 5, 7, 9, 67, 6345, 324]);
 console.log('Created Tree. Printing tree:')
 prettyPrint(myTree.root);
 
+myTree.traverse(myTree.root)
+
 // console.log("Inserting 40")
 // myTree.insert(myTree.root, 40)
 // prettyPrint(myTree.root);
@@ -127,8 +138,9 @@ prettyPrint(myTree.root);
 // myTree.insert(myTree.root, 6344)
 // prettyPrint(myTree.root);
 
-// console.log("Deleting undefined:")
-// myTree.deleteItem(myTree.root,undefined)
-// prettyPrint(myTree.root)
+// console.log("Deleting 8")
+// myTree.deleteItem(myTree.root, 8)
+// prettyPrint(myTree.root);
+
 
 //console.log('bahinga')
