@@ -39,13 +39,14 @@ function Tree(array) {
     return root;
   };
 
-  const traverse = (root) => {
-    if (root.left == null && root.right == null) return console.log(root)
+  const traverse = (root, callbackFn) => {
+    // if (callbackFn === null) throw new Error('No callback function provided.')
+    if (root.left == null && root.right == null) return callbackFn(root)
 
-    if (root.left != null) traverse(root.left)
-    if (root.right != null) traverse(root.right)
+    if (root.left != null) traverse(root.left, callbackFn)
+    if (root.right != null) traverse(root.right, callbackFn)
 
-    return console.log(root)
+    return callbackFn(root)
   }
   
   const insert = (root, value) => {
@@ -124,7 +125,11 @@ const myTree = Tree([1, 7, 4, 23, 8, 9, 4, 3, 5, 7, 9, 67, 6345, 324]);
 console.log('Created Tree. Printing tree:')
 prettyPrint(myTree.root);
 
-myTree.traverse(myTree.root)
+const consoleLog = (data) => {
+  console.log(data)
+}
+
+myTree.traverse(myTree.root,consoleLog)
 
 // console.log("Inserting 40")
 // myTree.insert(myTree.root, 40)
