@@ -39,14 +39,34 @@ function Tree(array) {
     return root;
   };
 
-  const traverse = (root, callbackFn) => {
+  const depthTraverse = (root, callbackFn) => {
     // if (callbackFn === null) throw new Error('No callback function provided.')
     if (root.left == null && root.right == null) return callbackFn(root)
 
-    if (root.left != null) traverse(root.left, callbackFn)
-    if (root.right != null) traverse(root.right, callbackFn)
+    if (root.left != null) depthTraverse(root.left, callbackFn)
+    if (root.right != null) depthTraverse(root.right, callbackFn)
 
     return callbackFn(root)
+  }
+
+  const breadthTraverse = (root, callbackFn) => {
+    // create a first in first out queue
+    let queueFIFO = []
+    
+    function discoverNodes(root, callbackFn) {
+      
+      if (root === null) return
+      queueFIFO.push(root)
+
+      while (queueFIFO.length > 0) {
+        let current = queueFIFO[0]
+        callbackFn(queueFIFO[0])
+        if (current.left !== null) queueFIFO.push(current.left)
+        if (current.right !== null) queueFIFO.push(current.right)
+        queueFIFO.shift()
+      }
+    }
+    discoverNodes(root,callbackFn)
   }
   
   const insert = (root, value) => {
@@ -102,7 +122,7 @@ function Tree(array) {
   // use return value of the BBST function for root
   let root = buildTree(array);
 
-  return { root, insert, deleteItem, insert, getSuccessor, traverse };
+  return { root, insert, deleteItem, insert, getSuccessor, depthTraverse, breadthTraverse };
 }
 
 const prettyPrint = (node, prefix = "", isLeft = true) => {
@@ -129,7 +149,9 @@ const consoleLog = (data) => {
   console.log(data)
 }
 
-myTree.traverse(myTree.root,consoleLog)
+myTree.breadthTraverse(myTree.root)
+
+// myTree.depthTraverse(myTree.root,consoleLog)
 
 // console.log("Inserting 40")
 // myTree.insert(myTree.root, 40)
