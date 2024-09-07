@@ -39,43 +39,67 @@ function Tree(array) {
     return root;
   };
 
-  const depthTraverse = (root, callbackFn) => {
-    // if (callbackFn === null) throw new Error('No callback function provided.')
-    if (root.left == null && root.right == null) return callbackFn(root)
-
-    if (root.left != null) depthTraverse(root.left, callbackFn)
-    if (root.right != null) depthTraverse(root.right, callbackFn)
-
-    return callbackFn(root)
-  }
-
-  const breadthTraverse = (root, callbackFn) => {
+  
+  const breadthTraverse = (callbackFn) => {
+    if (typeof callbackFn !== 'function') {throw new Error('No callback function provided.')}
+    
     // create a first in first out queue
     let queueFIFO = []
     
-    function discoverNodes(root, callbackFn) {
+    function discoverNodes(callbackFn) {
       
       if (root === null) return
       queueFIFO.push(root)
-
+      
       while (queueFIFO.length > 0) {
         let current = queueFIFO[0]
         callbackFn(queueFIFO[0])
         if (current.left !== null) queueFIFO.push(current.left)
-        if (current.right !== null) queueFIFO.push(current.right)
-        queueFIFO.shift()
+          if (current.right !== null) queueFIFO.push(current.right)
+            queueFIFO.shift()
+        }
       }
+      discoverNodes(callbackFn)
     }
-    discoverNodes(root,callbackFn)
-  }
-  
-  const insert = (root, value) => {
-    // if insert is run on a null node
-    // return a new node using the value
-    if (root === null) return new Node(value);
     
-    // if the node matches the value, end the insertion
-    if (root.data === value) return root;
+    const inOrder = (root, callbackFn) => {
+      if (typeof callbackFn !== 'function') {throw new Error('No callback function provided.')}
+      
+      if (root == null) return 
+
+      inOrder(root.left, callbackFn)
+      callbackFn(root)
+      inOrder(root.right, callbackFn)
+    }
+    
+    const preOrder = (root, callbackFn) => {
+      if (typeof callbackFn !== 'function') {throw new Error('No callback function provided.')}
+
+      if (root == null) return
+
+      callbackFn(root)
+      preOrder(root.left, callbackFn)
+      preOrder(root.right, callbackFn)
+      
+    }
+    
+    const postOrder = (root, callbackFn) => {
+      if (typeof callbackFn !== 'function') {throw new Error('No callback function provided.')}
+      if (root.left == null && root.right == null) return callbackFn(root)
+  
+      if (root.left != null) postOrder(root.left, callbackFn)
+      if (root.right != null) postOrder(root.right, callbackFn)
+  
+      return callbackFn(root)
+    }
+
+    const insert = (root, value) => {
+      // if insert is run on a null node
+      // return a new node using the value
+      if (root === null) return new Node(value);
+      
+      // if the node matches the value, end the insertion
+      if (root.data === value) return root;
     
     if (value < root.data) {
       root.left = insert(root.left, value);
@@ -122,7 +146,7 @@ function Tree(array) {
   // use return value of the BBST function for root
   let root = buildTree(array);
 
-  return { root, insert, deleteItem, insert, getSuccessor, depthTraverse, breadthTraverse };
+  return { root, insert, deleteItem, insert, getSuccessor, breadthTraverse, inOrder, preOrder };
 }
 
 const prettyPrint = (node, prefix = "", isLeft = true) => {
@@ -141,7 +165,8 @@ const prettyPrint = (node, prefix = "", isLeft = true) => {
 
 // const myTree = Tree([1,2,1,1,1])
 
-const myTree = Tree([1, 7, 4, 23, 8, 9, 4, 3, 5, 7, 9, 67, 6345, 324]);
+// const myTree = Tree([1, 7, 4, 23, 8, 9, 4, 3, 5, 7, 9, 67, 6345, 324]);
+const myTree = Tree([1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17])
 console.log('Created Tree. Printing tree:')
 prettyPrint(myTree.root);
 
@@ -149,9 +174,9 @@ const consoleLog = (data) => {
   console.log(data)
 }
 
-myTree.breadthTraverse(myTree.root)
+// myTree.breadthTraverse(consoleLog)
 
-// myTree.depthTraverse(myTree.root,consoleLog)
+myTree.preOrder(myTree.root,consoleLog)
 
 // console.log("Inserting 40")
 // myTree.insert(myTree.root, 40)
