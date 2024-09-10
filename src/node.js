@@ -115,6 +115,19 @@ function Tree(array) {
     console.log(`The provided node's height is: ${heightArray[heightArray.length - 1]}`)
   };
 
+  const getDepth = (queryNum) => {
+    let depth
+    function depthFunc(root, queryNum, height = 0) {
+      if (root === null) return
+      if (root.data === queryNum) return depth = height
+      depthFunc(root.left, queryNum, height+1)
+      depthFunc(root.right, queryNum, height+1)
+    }
+    depthFunc(root,queryNum)
+    if (Number.isInteger(depth)) return console.log(`Depth of value ${queryNum} is ${depth}.`)
+    console.log('value not found')
+  }
+
   const insert = (root, value) => {
     // if insert is run on a null node
     // return a new node using the value
@@ -178,6 +191,7 @@ function Tree(array) {
     inOrder,
     preOrder,
     getHeight,
+    getDepth
   };
 }
 
@@ -216,7 +230,8 @@ const consoleLog = (data) => {
   console.log(data);
 };
 
-myTree.getHeight(myTree.root)
+// myTree.getHeight(myTree.root)
+myTree.getDepth(23) // output
 
 // myTree.breadthTraverse(consoleLog)
 
