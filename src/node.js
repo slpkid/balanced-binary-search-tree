@@ -112,7 +112,20 @@ function Tree(array) {
 
     heightArray.sort(compareNumbers)
 
-    console.log(`The provided node's height is: ${heightArray[heightArray.length - 1]}`)
+    return heightArray[heightArray.length - 1]
+  };
+
+  const isBalanced = (root) => {
+    let heightArray = []
+    height(root, heightArray)
+
+    heightArray.sort(compareNumbers)
+
+    let difference = heightArray[heightArray.length - 1] - heightArray[0]
+
+    if (difference > 1) return false
+    return true
+    
   };
 
   const getDepth = (queryNum) => {
@@ -191,7 +204,8 @@ function Tree(array) {
     inOrder,
     preOrder,
     getHeight,
-    getDepth
+    getDepth,
+    isBalanced
   };
 }
 
@@ -215,12 +229,12 @@ const myTree = Tree([
   1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17,
 ]);
 
-myTree.insert(myTree.root, 18)
-myTree.insert(myTree.root, 19)
-myTree.insert(myTree.root, 20)
-myTree.insert(myTree.root, 21)
-myTree.insert(myTree.root, 22)
-myTree.insert(myTree.root, 23)
+// myTree.insert(myTree.root, 18)
+// myTree.insert(myTree.root, 19)
+// myTree.insert(myTree.root, 20)
+// myTree.insert(myTree.root, 21)
+// myTree.insert(myTree.root, 22)
+// myTree.insert(myTree.root, 23)
 
 
 console.log("Created Tree. Printing tree:");
@@ -231,7 +245,9 @@ const consoleLog = (data) => {
 };
 
 // myTree.getHeight(myTree.root)
-myTree.getDepth(23) // output
+// myTree.getDepth(24) // output
+
+console.log(myTree.isBalanced(myTree.root))
 
 // myTree.breadthTraverse(consoleLog)
 
