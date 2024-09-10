@@ -14,10 +14,8 @@ function Tree(array) {
   array = array.sort(compareNumbers);
 
   //remove duplicate values
-  array = [...new Set(array)]
+  array = [...new Set(array)];
 
-  console.log(array)
-  
   // use recursion to build the balance binary search tree
   // requires a sorted array
   const buildTree = (array, start = 0, end = array.length - 1) => {
@@ -25,9 +23,9 @@ function Tree(array) {
     const mid = Math.ceil((start + end) / 2);
 
     //escape if it's trying to access an out of range value.
-    if (mid === array.length) return null
+    if (mid === array.length) return null;
     let root = new Node(array[mid]);
-    
+
     root.left = buildTree(array, start, mid - 1);
     root.right = buildTree(array, mid + 1, end);
 
@@ -39,77 +37,101 @@ function Tree(array) {
     return root;
   };
 
-  
   const breadthTraverse = (callbackFn) => {
-    if (typeof callbackFn !== 'function') {throw new Error('No callback function provided.')}
-    
+    if (typeof callbackFn !== "function") {
+      throw new Error("No callback function provided.");
+    }
+
     // create a first in first out queue
-    let queueFIFO = []
-    
+    let queueFIFO = [];
+
     function discoverNodes(callbackFn) {
-      
-      if (root === null) return
-      queueFIFO.push(root)
-      
+      if (root === null) return;
+      queueFIFO.push(root);
+
       while (queueFIFO.length > 0) {
-        let current = queueFIFO[0]
-        callbackFn(queueFIFO[0])
-        if (current.left !== null) queueFIFO.push(current.left)
-          if (current.right !== null) queueFIFO.push(current.right)
-            queueFIFO.shift()
-        }
+        let current = queueFIFO[0];
+        callbackFn(queueFIFO[0]);
+        if (current.left !== null) queueFIFO.push(current.left);
+        if (current.right !== null) queueFIFO.push(current.right);
+        queueFIFO.shift();
       }
-      discoverNodes(callbackFn)
     }
-    
-    const inOrder = (root, callbackFn) => {
-      if (typeof callbackFn !== 'function') {throw new Error('No callback function provided.')}
-      
-      if (root == null) return 
+    discoverNodes(callbackFn);
+  };
 
-      inOrder(root.left, callbackFn)
-      callbackFn(root)
-      inOrder(root.right, callbackFn)
-    }
-    
-    const preOrder = (root, callbackFn) => {
-      if (typeof callbackFn !== 'function') {throw new Error('No callback function provided.')}
-
-      if (root == null) return
-
-      callbackFn(root)
-      preOrder(root.left, callbackFn)
-      preOrder(root.right, callbackFn)
-      
-    }
-    
-    const postOrder = (root, callbackFn) => {
-      if (typeof callbackFn !== 'function') {throw new Error('No callback function provided.')}
-      if (root.left == null && root.right == null) return callbackFn(root)
-  
-      if (root.left != null) postOrder(root.left, callbackFn)
-      if (root.right != null) postOrder(root.right, callbackFn)
-  
-      return callbackFn(root)
+  const inOrder = (root, callbackFn) => {
+    if (typeof callbackFn !== "function") {
+      throw new Error("No callback function provided.");
     }
 
-    const insert = (root, value) => {
-      // if insert is run on a null node
-      // return a new node using the value
-      if (root === null) return new Node(value);
-      
-      // if the node matches the value, end the insertion
-      if (root.data === value) return root;
+    if (root == null) return;
+
+    inOrder(root.left, callbackFn);
+    callbackFn(root);
+    inOrder(root.right, callbackFn);
+  };
+
+  const preOrder = (root, callbackFn) => {
+    if (typeof callbackFn !== "function") {
+      throw new Error("No callback function provided.");
+    }
+
+    if (root == null) return;
+
+    callbackFn(root);
+    preOrder(root.left, callbackFn);
+    preOrder(root.right, callbackFn);
+  };
+
+  const postOrder = (root, callbackFn) => {
+    if (typeof callbackFn !== "function") {
+      throw new Error("No callback function provided.");
+    }
+    if (root.left == null && root.right == null) return callbackFn(root);
+
+    if (root.left != null) postOrder(root.left, callbackFn);
+    if (root.right != null) postOrder(root.right, callbackFn);
+
+    return callbackFn(root);
+  };
+
+  // return the maximum height of the provided node.
+  const height = (root, heightArray, rootHeight = 0) => {
+    // escape case: if node has no children, print height
+    if (root === null) return heightArray.push(rootHeight);
+    rootHeight++;
+    height(root.left, heightArray, rootHeight);
+    height(root.right, heightArray, rootHeight);
     
+  };
+
+  const getHeight = (root) => {
+    let heightArray = []
+    height(root, heightArray)
+
+    heightArray.sort(compareNumbers)
+
+    console.log(`The provided node's height is: ${heightArray[heightArray.length - 1]}`)
+  };
+
+  const insert = (root, value) => {
+    // if insert is run on a null node
+    // return a new node using the value
+    if (root === null) return new Node(value);
+
+    // if the node matches the value, end the insertion
+    if (root.data === value) return root;
+
     if (value < root.data) {
       root.left = insert(root.left, value);
     } else if (value > root.data) {
       root.right = insert(root.right, value);
     }
-    
+
     return root;
   };
-  
+
   const getSuccessor = (current) => {
     current = current.right;
     while ((current !== null) & (current.left !== null)) {
@@ -117,7 +139,7 @@ function Tree(array) {
     }
     return current;
   };
-  
+
   const deleteItem = (root, value) => {
     //escape case::
     if (root === null) return root;
@@ -128,11 +150,11 @@ function Tree(array) {
       root.right = deleteItem(root.right, value);
     } else {
       if (root.left === null) {
-        return root.right
+        return root.right;
       }
-      
+
       if (root.right === null) {
-        return root.left
+        return root.left;
       }
 
       //when both children are present
@@ -146,7 +168,17 @@ function Tree(array) {
   // use return value of the BBST function for root
   let root = buildTree(array);
 
-  return { root, insert, deleteItem, insert, getSuccessor, breadthTraverse, inOrder, preOrder };
+  return {
+    root,
+    insert,
+    deleteItem,
+    insert,
+    getSuccessor,
+    breadthTraverse,
+    inOrder,
+    preOrder,
+    getHeight,
+  };
 }
 
 const prettyPrint = (node, prefix = "", isLeft = true) => {
@@ -162,21 +194,51 @@ const prettyPrint = (node, prefix = "", isLeft = true) => {
   }
 };
 
-
 // const myTree = Tree([1,2,1,1,1])
 
 // const myTree = Tree([1, 7, 4, 23, 8, 9, 4, 3, 5, 7, 9, 67, 6345, 324]);
-const myTree = Tree([1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17])
-console.log('Created Tree. Printing tree:')
+const myTree = Tree([
+  1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17,
+]);
+
+myTree.insert(myTree.root, 18)
+myTree.insert(myTree.root, 19)
+myTree.insert(myTree.root, 20)
+myTree.insert(myTree.root, 21)
+myTree.insert(myTree.root, 22)
+myTree.insert(myTree.root, 23)
+
+
+console.log("Created Tree. Printing tree:");
 prettyPrint(myTree.root);
 
 const consoleLog = (data) => {
-  console.log(data)
-}
+  console.log(data);
+};
+
+myTree.getHeight(myTree.root)
 
 // myTree.breadthTraverse(consoleLog)
 
-myTree.preOrder(myTree.root,consoleLog)
+// myTree.preOrder(myTree.root, consoleLog);
+
+// console.log(returnBiggestNumber.returnTheBiggestNumber())
+
+// returnBiggestNumber.checkBiggestNumber(3)
+
+// console.log(returnBiggestNumber.returnTheBiggestNumber())
+
+// returnBiggestNumber.checkBiggestNumber(2)
+
+// console.log(returnBiggestNumber.returnTheBiggestNumber())
+
+// returnBiggestNumber.resetBiggestNumber()
+
+// console.log(returnBiggestNumber.returnTheBiggestNumber())
+
+
+// let array = [myTree.height(myTree.root)]
+// console.log(array)
 
 // console.log("Inserting 40")
 // myTree.insert(myTree.root, 40)
@@ -193,6 +255,5 @@ myTree.preOrder(myTree.root,consoleLog)
 // console.log("Deleting 8")
 // myTree.deleteItem(myTree.root, 8)
 // prettyPrint(myTree.root);
-
 
 //console.log('bahinga')
