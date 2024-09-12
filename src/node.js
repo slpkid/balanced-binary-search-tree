@@ -9,34 +9,37 @@ function Tree(array) {
   const compareNumbers = (a, b) => {
     return a - b;
   };
-
+  
   // sort the provided array
   array = array.sort(compareNumbers);
-
+  
   //remove duplicate values
   array = [...new Set(array)];
-
+  
   // use recursion to build the balance binary search tree
   // requires a sorted array
   const buildTree = (array, start = 0, end = array.length - 1) => {
     if (start > end) return null;
     const mid = Math.ceil((start + end) / 2);
-
+    
     //escape if it's trying to access an out of range value.
     if (mid === array.length) return null;
-    let root = new Node(array[mid]);
-
-    root.left = buildTree(array, start, mid - 1);
-    root.right = buildTree(array, mid + 1, end);
-
+    let rootDude = new Node(array[mid]);
+    
+    rootDude.left = buildTree(array, start, mid - 1);
+    rootDude.right = buildTree(array, mid + 1, end);
+    
     // console.log(root)
     // console.log(start)
     // console.log(end)
     // console.log(mid)
-
-    return root;
+    
+    return rootDude;
   };
 
+  // use return value of the BBST function for root
+  let root = buildTree(array);
+  
   const breadthTraverse = (callbackFn) => {
     if (typeof callbackFn !== "function") {
       throw new Error("No callback function provided.");
@@ -103,43 +106,59 @@ function Tree(array) {
     rootHeight++;
     height(root.left, heightArray, rootHeight);
     height(root.right, heightArray, rootHeight);
-    
   };
 
   const getHeight = (root) => {
-    let heightArray = []
-    height(root, heightArray)
+    let heightArray = [];
+    height(root, heightArray);
 
-    heightArray.sort(compareNumbers)
+    heightArray.sort(compareNumbers);
 
-    return heightArray[heightArray.length - 1]
+    return heightArray[heightArray.length - 1];
   };
 
   const isBalanced = (root) => {
-    let heightArray = []
-    height(root, heightArray)
+    let heightArray = [];
+    height(root, heightArray);
 
-    heightArray.sort(compareNumbers)
+    heightArray.sort(compareNumbers);
 
-    let difference = heightArray[heightArray.length - 1] - heightArray[0]
+    let difference = heightArray[heightArray.length - 1] - heightArray[0];
 
-    if (difference > 1) return false
-    return true
-    
+    if (difference > 1) return false;
+    return true;
+  };
+
+  const rebalance = function () {
+    let newRootArray = [];
+    function pushToNewArray(num) {
+      newRootArray.push(num.data);
+    }
+
+    preOrder(this.root, pushToNewArray);
+    // i don't know how to make this work without
+    // passing the tree itself into the method
+    // so that it has the closure in order to modify itself...
+    // root = buildTree(newRootArray);
+
+    this.root = buildTree(newRootArray)
+
+    // prettyPrint(root)
   };
 
   const getDepth = (queryNum) => {
-    let depth
+    let depth;
     function depthFunc(root, queryNum, height = 0) {
-      if (root === null) return
-      if (root.data === queryNum) return depth = height
-      depthFunc(root.left, queryNum, height+1)
-      depthFunc(root.right, queryNum, height+1)
+      if (root === null) return;
+      if (root.data === queryNum) return (depth = height);
+      depthFunc(root.left, queryNum, height + 1);
+      depthFunc(root.right, queryNum, height + 1);
     }
-    depthFunc(root,queryNum)
-    if (Number.isInteger(depth)) return console.log(`Depth of value ${queryNum} is ${depth}.`)
-    console.log('value not found')
-  }
+    depthFunc(root, queryNum);
+    if (Number.isInteger(depth))
+      return console.log(`Depth of value ${queryNum} is ${depth}.`);
+    console.log("value not found");
+  };
 
   const insert = (root, value) => {
     // if insert is run on a null node
@@ -191,9 +210,6 @@ function Tree(array) {
     return root;
   };
 
-  // use return value of the BBST function for root
-  let root = buildTree(array);
-
   return {
     root,
     insert,
@@ -205,7 +221,8 @@ function Tree(array) {
     preOrder,
     getHeight,
     getDepth,
-    isBalanced
+    isBalanced,
+    rebalance
   };
 }
 
@@ -229,25 +246,30 @@ const myTree = Tree([
   1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17,
 ]);
 
-// myTree.insert(myTree.root, 18)
-// myTree.insert(myTree.root, 19)
-// myTree.insert(myTree.root, 20)
-// myTree.insert(myTree.root, 21)
-// myTree.insert(myTree.root, 22)
-// myTree.insert(myTree.root, 23)
-
+myTree.insert(myTree.root, 18);
+myTree.insert(myTree.root, 19);
+myTree.insert(myTree.root, 20);
+myTree.insert(myTree.root, 21);
+myTree.insert(myTree.root, 22);
+myTree.insert(myTree.root, 23);
 
 console.log("Created Tree. Printing tree:");
-prettyPrint(myTree.root);
+// prettyPrint(myTree.root);
 
 const consoleLog = (data) => {
   console.log(data);
 };
 
+myTree.rebalance();
+
+prettyPrint(myTree.root);
+
+// myTree.root = null
+
 // myTree.getHeight(myTree.root)
 // myTree.getDepth(24) // output
 
-console.log(myTree.isBalanced(myTree.root))
+// console.log(myTree.isBalanced(myTree.root))
 
 // myTree.breadthTraverse(consoleLog)
 
@@ -266,7 +288,6 @@ console.log(myTree.isBalanced(myTree.root))
 // returnBiggestNumber.resetBiggestNumber()
 
 // console.log(returnBiggestNumber.returnTheBiggestNumber())
-
 
 // let array = [myTree.height(myTree.root)]
 // console.log(array)
