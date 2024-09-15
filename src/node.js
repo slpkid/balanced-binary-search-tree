@@ -9,38 +9,33 @@ function Tree(array) {
   const compareNumbers = (a, b) => {
     return a - b;
   };
-  
+
   // sort the provided array
   array = array.sort(compareNumbers);
-  
+
   //remove duplicate values
   array = [...new Set(array)];
-  
+
   // use recursion to build the balance binary search tree
   // requires a sorted array
   const buildTree = (array, start = 0, end = array.length - 1) => {
     if (start > end) return null;
     const mid = Math.ceil((start + end) / 2);
-    
+
     //escape if it's trying to access an out of range value.
     if (mid === array.length) return null;
-    let rootDude = new Node(array[mid]);
-    
-    rootDude.left = buildTree(array, start, mid - 1);
-    rootDude.right = buildTree(array, mid + 1, end);
-    
-    // console.log(root)
-    // console.log(start)
-    // console.log(end)
-    // console.log(mid)
-    
-    return rootDude;
+    let root = new Node(array[mid]);
+
+    root.left = buildTree(array, start, mid - 1);
+    root.right = buildTree(array, mid + 1, end);
+
+    return root;
   };
 
   // use return value of the BBST function for root
   let root = buildTree(array);
-  
-  const breadthTraverse = (callbackFn) => {
+
+  const breadthTraverse = function(callbackFn) {
     if (typeof callbackFn !== "function") {
       throw new Error("No callback function provided.");
     }
@@ -48,78 +43,85 @@ function Tree(array) {
     // create a first in first out queue
     let queueFIFO = [];
 
-    function discoverNodes(callbackFn) {
+    function discoverNodes(callbackFn, root) {
       if (root === null) return;
+      // initialize the queue
       queueFIFO.push(root);
 
       while (queueFIFO.length > 0) {
+        // make the first item in queue the current value
         let current = queueFIFO[0];
+        // execute the callback on the current value
         callbackFn(queueFIFO[0]);
+        // enqueue the child nodes
         if (current.left !== null) queueFIFO.push(current.left);
         if (current.right !== null) queueFIFO.push(current.right);
+        // dequeue first item
         queueFIFO.shift();
       }
     }
-    discoverNodes(callbackFn);
+    discoverNodes(callbackFn, this.root);
   };
 
-  const inOrder = (root, callbackFn) => {
+  const inOrder = function (callbackFn, node = this.root) {
     if (typeof callbackFn !== "function") {
       throw new Error("No callback function provided.");
     }
 
-    if (root == null) return;
+    if (node == null) return;
 
-    inOrder(root.left, callbackFn);
-    callbackFn(root);
-    inOrder(root.right, callbackFn);
+    inOrder(callbackFn, node.left);
+    callbackFn(node);
+    inOrder(callbackFn, node.right);
   };
 
-  const preOrder = (root, callbackFn) => {
+  const preOrder = function (callbackFn, node = this.root) {
     if (typeof callbackFn !== "function") {
       throw new Error("No callback function provided.");
     }
 
-    if (root == null) return;
+    if (node  == null) return;
 
-    callbackFn(root);
-    preOrder(root.left, callbackFn);
-    preOrder(root.right, callbackFn);
+    callbackFn(node);
+    preOrder(callbackFn, node.left);
+    preOrder(callbackFn, node.right);
   };
 
-  const postOrder = (root, callbackFn) => {
+  const postOrder = function (callbackFn, node = this.root) {
     if (typeof callbackFn !== "function") {
       throw new Error("No callback function provided.");
     }
-    if (root.left == null && root.right == null) return callbackFn(root);
 
-    if (root.left != null) postOrder(root.left, callbackFn);
-    if (root.right != null) postOrder(root.right, callbackFn);
+    if (node  == null) return;
 
-    return callbackFn(root);
+    postOrder(callbackFn, node.left);
+    postOrder(callbackFn, node.right);
+    callbackFn(node);
   };
 
   // return the maximum height of the provided node.
   const height = (root, heightArray, rootHeight = 0) => {
     // escape case: if node has no children, print height
-    if (root === null) return heightArray.push(rootHeight);
-    rootHeight++;
-    height(root.left, heightArray, rootHeight);
-    height(root.right, heightArray, rootHeight);
+    if (root === null) {
+      return heightArray.push(rootHeight);
+    }
+    height(root.left, heightArray, rootHeight + 1);
+    height(root.right, heightArray, rootHeight + 1);
   };
 
-  const getHeight = (root) => {
+  const getHeight = function () {
     let heightArray = [];
-    height(root, heightArray);
+    height(this.root, heightArray);
 
     heightArray.sort(compareNumbers);
 
     return heightArray[heightArray.length - 1];
   };
 
-  const isBalanced = (root) => {
+  const isBalanced = function () {
     let heightArray = [];
-    height(root, heightArray);
+    // generate array containing heights of all the tree's heights
+    height(this.root, heightArray);
 
     heightArray.sort(compareNumbers);
 
@@ -130,34 +132,42 @@ function Tree(array) {
   };
 
   const rebalance = function () {
+    // create empty array
     let newRootArray = [];
     function pushToNewArray(num) {
       newRootArray.push(num.data);
     }
+    // traverse through current tree and push each value
+    preOrder(pushToNewArray, this.root);
 
-    preOrder(this.root, pushToNewArray);
-    // i don't know how to make this work without
-    // passing the tree itself into the method
-    // so that it has the closure in order to modify itself...
-    // root = buildTree(newRootArray);
+    this.root = null
 
-    this.root = buildTree(newRootArray)
-
-    // prettyPrint(root)
+    // newRootArray.forEach( number => {
+    //   deleteItem(this.root, number)
+    // })
+    
+    // reassign root to a tree built from the new values.
+    this.root = buildTree(newRootArray);
   };
 
   const getDepth = (queryNum) => {
     let depth;
     function depthFunc(root, queryNum, height = 0) {
       if (root === null) return;
+      // value of the node matches queried number,
+      // assign depth to the value of height
       if (root.data === queryNum) return (depth = height);
       depthFunc(root.left, queryNum, height + 1);
       depthFunc(root.right, queryNum, height + 1);
     }
     depthFunc(root, queryNum);
-    if (Number.isInteger(depth))
+    // if depth has been assigned a numerical value
+    // return it
+    if (Number.isInteger(depth)) {
       return console.log(`Depth of value ${queryNum} is ${depth}.`);
-    console.log("value not found");
+    } else {
+      console.log("value not found");
+    }
   };
 
   const insert = (root, value) => {
@@ -211,6 +221,7 @@ function Tree(array) {
   };
 
   return {
+    buildTree,
     root,
     insert,
     deleteItem,
@@ -219,10 +230,11 @@ function Tree(array) {
     breadthTraverse,
     inOrder,
     preOrder,
+    postOrder,
     getHeight,
     getDepth,
     isBalanced,
-    rebalance
+    rebalance,
   };
 }
 
@@ -239,73 +251,59 @@ const prettyPrint = (node, prefix = "", isLeft = true) => {
   }
 };
 
-// const myTree = Tree([1,2,1,1,1])
+function driverScript() {
+  let array = [];
+  for (let i = 0; i < 100; i++) {
+    array.push(getRandomInt(1, 100));
+  }
+  // create the Tree
+  const myTree = Tree(array);
+  prettyPrint(myTree.root);
+  // verify the tree is balanced
+  console.log(`Is the tree balanced? This statement is: ${myTree.isBalanced()}`);
 
-// const myTree = Tree([1, 7, 4, 23, 8, 9, 4, 3, 5, 7, 9, 67, 6345, 324]);
-const myTree = Tree([
-  1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17,
-]);
+  // add values > 100 and unbalance tree
+  for (let i = 0; i < 20; i++) {
+    myTree.insert(myTree.root, getRandomInt(100, 200));
+  }
 
-myTree.insert(myTree.root, 18);
-myTree.insert(myTree.root, 19);
-myTree.insert(myTree.root, 20);
-myTree.insert(myTree.root, 21);
-myTree.insert(myTree.root, 22);
-myTree.insert(myTree.root, 23);
+  prettyPrint(myTree.root);
 
-console.log("Created Tree. Printing tree:");
-// prettyPrint(myTree.root);
+  console.log(`Tree height is ${myTree.getHeight()}`)
+  // verify the tree is unbalanced
+  console.log(`Is the tree balanced? This statement is: ${myTree.isBalanced()}`);
+  
 
-const consoleLog = (data) => {
-  console.log(data);
-};
+  console.log(`Rebalancing tree...`)
+  myTree.rebalance();
+  prettyPrint(myTree.root)
+  console.log(`Tree height is ${myTree.getHeight()}`)
 
-myTree.rebalance();
+  // verify the tree is balanced
+  console.log(`Is the tree balanced? This statement is: ${myTree.isBalanced()}`);
 
-prettyPrint(myTree.root);
+  console.log('level order')
+  myTree.breadthTraverse(consoleLog);
 
-// myTree.root = null
+  console.log('pre order')
+  myTree.preOrder(consoleLog);
 
-// myTree.getHeight(myTree.root)
-// myTree.getDepth(24) // output
+  console.log('post order')
+  myTree.postOrder(consoleLog);
 
-// console.log(myTree.isBalanced(myTree.root))
+  console.log('in order')
+  myTree.inOrder(consoleLog);
 
-// myTree.breadthTraverse(consoleLog)
+}
 
-// myTree.preOrder(myTree.root, consoleLog);
+function consoleLog(input) {
+  console.log(input);
+}
 
-// console.log(returnBiggestNumber.returnTheBiggestNumber())
+function getRandomInt(min, max) {
+  const minCeiled = Math.ceil(min);
+  const maxFloored = Math.floor(max);
+  return Math.floor(Math.random() * (maxFloored - minCeiled) + minCeiled); // The maximum is exclusive and the minimum is inclusive
+}
 
-// returnBiggestNumber.checkBiggestNumber(3)
-
-// console.log(returnBiggestNumber.returnTheBiggestNumber())
-
-// returnBiggestNumber.checkBiggestNumber(2)
-
-// console.log(returnBiggestNumber.returnTheBiggestNumber())
-
-// returnBiggestNumber.resetBiggestNumber()
-
-// console.log(returnBiggestNumber.returnTheBiggestNumber())
-
-// let array = [myTree.height(myTree.root)]
-// console.log(array)
-
-// console.log("Inserting 40")
-// myTree.insert(myTree.root, 40)
-// prettyPrint(myTree.root);
-
-// console.log("Inserting 30")
-// myTree.insert(myTree.root, 30)
-// prettyPrint(myTree.root);
-
-// console.log("Inserting 6344")
-// myTree.insert(myTree.root, 6344)
-// prettyPrint(myTree.root);
-
-// console.log("Deleting 8")
-// myTree.deleteItem(myTree.root, 8)
-// prettyPrint(myTree.root);
-
-//console.log('bahinga')
+driverScript();
